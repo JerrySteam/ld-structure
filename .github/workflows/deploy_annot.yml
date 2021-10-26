@@ -1,0 +1,25 @@
+name: deploy-lds
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: cd app && docker build -t jerryemmanuel/pgwaslds:latest -t jerryemmanuel/pgwaslds:$GITHUB_SHA .
+      - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      - run: docker push jerryemmanuel/pgwaslds
+      - run: docker push jerryemmanuel/pgwaslds:$GITHUB_SHA
+      #- uses: digitalocean/action-doctl@v2
+      #  with:
+      #    token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      #- run: doctl kubernetes cluster kubeconfig save k8s-1-21-2-do-2-fra-pgwas
+      #- run: helm upgrade annot ./dev_depl/helm/ --install --wait --set image=jerryemmanuel/pgwaslds:$GITHUB_SHA --values=./dev_depl/helm/micro-values.yaml
