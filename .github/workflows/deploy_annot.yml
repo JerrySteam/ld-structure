@@ -3,7 +3,7 @@ name: deploy-lds
 on:
   push:
     branches:
-      - main
+      - new-main
     paths:
       - '**'
 jobs:
